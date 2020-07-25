@@ -121,11 +121,13 @@ lazy val shapePathRoot = project
 
 lazy val shapepath = project
   .in(file("modules/shapepath"))
+  .enablePlugins(Antlr4Plugin)
   .disablePlugins(RevolverPlugin)
   .settings(
     crossScalaVersions := supportedScalaVersions,
     commonSettings,
-    publishSettings
+    publishSettings,
+    antlrSettings("es.weso.shapepath.parser"),
   )
   .dependsOn(
   )
@@ -139,6 +141,7 @@ lazy val shapepath = project
       circeParser,
       catsEffect,
       pprint,
+      antlr4,
       scalaTest  % Test,
       scalacheck % Test,
       shex
@@ -233,7 +236,7 @@ lazy val commonSettings = compilationSettings ++ sharedDependencies ++ Seq(
 )
 
 def antlrSettings(packageName: String) = Seq(
-  antlr4GenListener in Antlr4 := true,
+  antlr4GenListener in Antlr4 := false,
   antlr4GenVisitor in Antlr4 := true,
   antlr4Dependency in Antlr4 := antlr4,
   antlr4PackageName in Antlr4 := Some(packageName)

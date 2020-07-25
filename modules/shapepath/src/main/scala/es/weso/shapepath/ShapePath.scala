@@ -22,10 +22,15 @@ case class UnmatchItemContextLabel(item: Item, step: Step, ContextLabel: Context
 
 object ShapePath {
 
+  def eval(p: ShapePath, s: Schema, maybeValue: Option[Value] = None): (List[ProcessingError], Value) =
+    evaluateShapePath(p,s, maybeValue.getOrElse(Value(List()))).run
 
-  type Comp[A] = Writer[List[ProcessingError],A]
+  def fromString(str: String, format: String = "Compact"): Either[String, ShapePath] =
+    Left(s"Not implemented ShapePath.fromString yet")
 
-  def checkContext(ctx: Context)(item: Item): Boolean = ctx match {
+  private type Comp[A] = Writer[List[ProcessingError],A]
+
+  private def checkContext(ctx: Context)(item: Item): Boolean = ctx match {
     case ShapeAndCtx => item match {
       case ShapeExprItem(se) => se match {
         case _: ShapeAnd => true
@@ -84,12 +89,12 @@ object ShapePath {
     }
   }
 
-  def matchShapeExprId(lbl: ShapeLabel)(se: ShapeExpr): Boolean = se.id match {
+  private def matchShapeExprId(lbl: ShapeLabel)(se: ShapeExpr): Boolean = se.id match {
     case None => false
     case Some(idLbl) => idLbl == lbl
   }
 
-  def evaluateIndex(items: List[Item], index: ExprIndex): Comp[Value] = {
+  private def evaluateIndex(items: List[Item], index: ExprIndex): Comp[Value] = {
     val zero: Comp[Value] = Value(List()).pure[Comp]
     def cmb(item: Item, current: Comp[Value]): Comp[Value] = item match {
       case SchemaItem(s) => index match {
@@ -107,7 +112,7 @@ object ShapePath {
     items.foldRight(zero)(cmb)
   }
 
-  def evaluateStep(s: Schema)(step: Step, current: Comp[Value]): Comp[Value] = step match {
+  private def evaluateStep(s: Schema)(step: Step, current: Comp[Value]): Comp[Value] = step match {
     case es: ExprStep => {
       es.maybeContext match {
         case None => for {
@@ -124,12 +129,14 @@ object ShapePath {
       }
     }
   }
-  def evaluateShapePath(p: ShapePath, s: Schema, v: Value): Comp[Value] = {
+
+  private def evaluateShapePath(p: ShapePath, s: Schema, v: Value): Comp[Value] = {
     val zero: Comp[Value] = if (p.startsWithRoot) {
       Value(s.localShapes.map(ShapeExprItem(_))).pure[Comp]
     } else v.pure[Comp]
     p.steps.foldRight(zero)(evaluateStep(s))
   }
+
 }
 
 sealed abstract class Step

@@ -3,201 +3,189 @@
   "tests": [
     {
       "name": "2Eachdot_S_a",
-      "from": "./2Eachdot",
-      "shexPath": "/@<http://a.example/S>/<http://a.example/a>",
+      "from": "./2Eachdot.json",
+      "shapePath": "/@<http://a.example/S>/<http://a.example/a>",
       "expect": "2Eachdot_S_a"
     },
     {
       "name": "2Eachdot_S_b",
-      "from": "2Eachdot",
-      "shexPath": "/@<http://a.example/S>/<http://a.example/b>",
+      "from": "2Eachdot.json",
+      "shapePath": "/@<http://a.example/S>/<http://a.example/b>",
       "expect": "2Eachdot_S_b"
     },
     {
-      "name": "nested_S0_p2_valueExpr",
+      "name": "nested_S0_2_1_valueExpr",
       "from": "./nested.json",
-      "shexPath": "@<S0>/2/1",
+      "shapePath": "@<S0>/2/1",
       "expect": "nested_S0_p2_valueExpr"
     },
     {
       "name": "nested_s0_2_1*",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/2/1*",
+      "shapePath": "@<base:/S0>/2/1*",
       "throws": true,
       "expect": "Error: unable to parse at offset 15: *"
     },
     {
       "name": "nested_baseS0_p2_valueExpr",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/2/1",
+      "shapePath": "@<base:/S0>/2/1",
       "expect": "nested_S0_p2_valueExpr"
     },
     {
       "name": "nested_baseS0_p2_valueExpr_TC",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 2/TripleConstraint/Shape/TripleConstraint",
+      "shapePath": "@<base:/S0>/EachOf 2/TripleConstraint/Shape/TripleConstraint",
       "expect": "nested_S0_p2_valueExpr_TC"
     },
     {
       "name": "nested_baseS0_p2_EachOf 2_TripleConstraint",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 2/TripleConstraint/",
+      "shapePath": "@<base:/S0>/EachOf 2/TripleConstraint/",
       "expect": "nested_S0_p2"
     },
     {
       "name": "nested_baseS0_EachOf 2",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 2",
+      "shapePath": "@<base:/S0>/EachOf 2",
       "expect": "nested_S0_p2"
     },
     {
       "name": "nested_S0_p2_valueExpr",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 2/.valueExpr",
+      "shapePath": "@<base:/S0>/EachOf 2/.valueExpr",
       "expect": "nested_S0_p2_valueExpr"
     },
     {
       "name": "nested_baseS0_1",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/1",
+      "shapePath": "@<base:/S0>/1",
       "expect": "nested_S0_p1"
     },
     {
       "name": "nested_baseS0_EachOf_1",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 1",
+      "shapePath": "@<base:/S0>/EachOf 1",
       "expect": "nested_S0_p1"
     },
     {
       "name": "nested_baseS0_1_valueExpr",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/1.valueExpr",
+      "shapePath": "@<base:/S0>/1.valueExpr",
       "expect": "nested_S0_p1_valueExpr"
     },
     {
       "name": "nested_baseS0_EachOf_1_valueExpr",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 1.valueExpr",
+      "shapePath": "@<base:/S0>/EachOf 1.valueExpr",
       "expect": "nested_S0_p1_valueExpr"
     },
     {
       "name": "nested_baseS0_EachOf_2_valueExpr",
       "from": "./nested.json",
-      "shexPath": "@<base:/S0>/EachOf 2.valueExpr",
+      "shapePath": "@<base:/S0>/EachOf 2.valueExpr",
       "expect": "nested_S0_p2_valueExpr"
     },
     {
       "name": "1dotRefOR3_S1",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>",
       "expect": "1dotRefOR3_S1"
     },
     {
       "name": "1dotRefOR3_S4",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S4>",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S4>",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_p1",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>",
       "expect": "1dotRefOR3_p1"
     },
     {
       "name": "1dotRefOR3_p1_valueExpr",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr",
       "expect": "1dotRefOR3_p1_valueExpr"
     },
     {
       "name": "1dotRefOR3_p1_valueExpr_type",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr.type",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr.type",
       "expect": "1dotRefOR3_p1_valueExpr_type"
     },
     {
       "name": "1dotRefOR3_S1_p1_valueExpr_3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr/@3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr/@3",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_S1_p1_at_3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>/@3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>/@3",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_S1_p1_valueExpr_ShapeOr3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr/@ShapeOr3",
-      "expect": "1dotRefOR3_S4"
-    },
-    {
-      "name": "1dotRefOR3_S1_p1_at_ShapeOr3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>/@ShapeOr3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr/@ShapeOr3",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_S1_p1_valueExpr_at_ShapeAnd3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr/@ShapeAnd3",
-      "expect": "empty"
-    },
-    {
-      "name": "1dotRefOR3_S1_p1_at_ShapeAnd3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>/@ShapeAnd3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>.valueExpr/@ShapeAnd3",
       "expect": "empty"
     },
     {
       "name": "1dotRefOR3_S1_p1_at3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>/@3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>/@3",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_S1_p1_at_ShapeOr3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>/@ShapeOr3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>/@ShapeOr3",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_S1_p1_at_ShapeAnd3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/@<http://a.example/S1>/<http://a.example/p1>/@ShapeAnd3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/@<http://a.example/S1>/<http://a.example/p1>/@ShapeAnd3",
       "expect": "empty"
     },
     {
       "name": "1dotRefOR3_1",
-      "from": "./1dotRefOR3",
-      "shexPath": "/1",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/1",
       "expect": "1dotRefOR3_S1"
     },
     {
       "name": "1dotRefOR3_4",
-      "from": "./1dotRefOR3",
-      "shexPath": "/4",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/4",
       "expect": "1dotRefOR3_S4"
     },
     {
       "name": "1dotRefOR3_1_1",
-      "from": "./1dotRefOR3",
-      "shexPath": "/1/1",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/1/1",
       "expect": "1dotRefOR3_p1"
     },
     {
       "name": "1dotRefOR3_1_1_valueExpr",
-      "from": "./1dotRefOR3",
-      "shexPath": "/1/1.valueExpr",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/1/1.valueExpr",
       "expect": "1dotRefOR3_p1_valueExpr"
     },
     {
       "name": "1dotRefOR3_1_1_valueExpr_at3",
-      "from": "./1dotRefOR3",
-      "shexPath": "/1/1.valueExpr/@3",
+      "from": "./1dotRefOR3.json",
+      "shapePath": "/1/1.valueExpr/@3",
       "expect": "1dotRefOR3_S4"
     }
   ]

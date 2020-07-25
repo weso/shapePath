@@ -1,12 +1,69 @@
 package es.weso.shapepath
-import cats.effect.IO
+import cats.MonadError
+import cats.effect.{IO, Resource}
 import es.weso.rdf.nodes.IRI
 import es.weso.shex.{IRILabel, Schema}
 import org.scalatest._
 import matchers.should._
 import org.scalatest.funspec.AnyFunSpec
+import io.circe._
+import io.circe.syntax._
+import io.circe.parser._
+// import cats.syntax.applicative._
+import cats.implicits._
+import scala.io.{BufferedSource, Source}
 
 class ShapePathTest extends AnyFunSpec with Matchers {
+
+  val manifestPath = "src/test/resources/test-suite/"
+
+  def readFile(path: String): Resource[IO, BufferedSource] =
+    Resource.fromAutoCloseable(IO(Source.fromFile(path)))
+
+  def readContents(path: String): Resource[IO, String] =
+    readFile(path).map(_.mkString)
+
+  def readJsonContents(path: String): Resource[IO, Either[ParsingFailure, Json]] =
+    readContents(path).map(parse(_))
+
+  def json2manifest(json: Json): Either[String, Manifest] = {
+    import Manifest._
+    json.as[Manifest].fold(err => Left(s"Error converting Json file to Manifest: ${err.getMessage()}"), Right(_))
+  }
+
+  def either2io[E, A](e: Either[E, A], cnv: E => Throwable): IO[A] = {
+    val either: Either[Throwable, A] = e.bimap(s => cnv(s), identity)
+    MonadError[IO, Throwable].rethrow(IO(either))
+  }
+
+  def eitherStr2io[A](e: Either[String,A]): IO[A] =
+    either2io(e, cnvMsg)
+
+  def cnvMsg(msg: String): Throwable = new RuntimeException(msg)
+
+  def cnvFailure(df: ParsingFailure): Throwable = new RuntimeException(df.getMessage())
+
+  def processEntry(entry: ManifestEntry): IO[Unit] = for {
+     _ <- IO { it(s"Should run entry: ${entry.name}") {
+       val cmp = readContents(manifestPath + entry.from).use(str => for {
+         schema <- Schema.fromString(str,"ShEXJ",None)
+         shapePath <- eitherStr2io(ShapePath.fromString(entry.shapePath,"Compact"))
+         pair = ShapePath.eval(shapePath, schema)
+         (es,v) = pair
+         _ <- IO { println(s"Processing errors: ${es.map(e => e + "\n").mkString}")}
+       } yield v)
+       cmp.attempt.unsafeRunSync().fold(
+         err => fail(s"Error $err"),
+         value => info(s"$value should be(${entry.expect})")
+       )
+    }
+    }
+  } yield ()
+
+  def processManifest(manifest: Manifest): IO[Unit] = {
+    manifest.tests.map(processEntry).sequence.void
+  }
+
   describe(s"ShapePath") {
     it(s"Evaluates a shapePath") {
       // /@<#IssueShape>/2
@@ -45,11 +102,54 @@ class ShapePathTest extends AnyFunSpec with Matchers {
       s.attempt.unsafeRunSync match {
         case Left(e) => fail(s"Error: $e")
         case Right(s) => {
-          val (es,v) = ShapePath.evaluateShapePath(path,s,Value(List())).run
+          val (es, v) = ShapePath.eval(path, s)
           es shouldBe empty
           info(s"Schema parsed:\n$s\nValue: $v")
         }
       }
     }
   }
+  describe(s"ShapePath from Manifest") {
+      def runManifest(json: Json): IO[Unit] = for {
+        manifest <- either2io(json2manifest(json), cnvMsg)
+        _ <- processManifest(manifest)
+      } yield ()
+
+      val cmp = readJsonContents(manifestPath + "Manifest.json").use(either =>
+        either.fold(err => IO {
+          println(s"Error parsing manifest: \n$err")
+        }, json => runManifest(json))
+      )
+      cmp.unsafeRunSync()
+  }
+
+  describe(s"Embedded manifest") {
+    val str =
+        """|{
+           |  "description": "collection of partition tests",
+           |  "tests": [
+           |    {
+           |      "name": "2Eachdot_S_a",
+           |      "from": "./2Eachdot.json",
+           |      "shexPath": "/@<http://a.example/S>/<http://a.example/a>",
+           |      "expect": "2Eachdot_S_a"
+           |    },
+           |    {
+           |      "name": "nested_s0_2_1*",
+           |      "from": "./nested.json",
+           |      "shexPath": "@<base:/S0>/2/1*",
+           |      "throws": true,
+           |      "expect": "Error: unable to parse at offset 15: *"
+           |    }
+           | ]
+           |}""".stripMargin
+
+
+      val cmp = for {
+        json <- either2io(parse(str), cnvFailure)
+        manifest <- either2io(json2manifest(json), cnvMsg)
+        _ <- processManifest(manifest)
+      } yield ()
+      cmp.attempt.unsafeRunSync.fold(e => println(s"Error: $e"), v => println(s"OK: $v"))
+    }
 }
