@@ -6,6 +6,7 @@ import cats.instances.list._
 import cats.syntax.applicative._
 import cats.syntax.writer._
 import es.weso.rdf.nodes.{BNode, IRI}
+import es.weso.shapepath.compact.Parser
 import es.weso.shex.{EachOf, IRILabel, NodeConstraint, OneOf, Schema, Shape, ShapeAnd, ShapeExpr, ShapeLabel, ShapeNot, ShapeOr, TripleConstraint, TripleExpr}
 
 case class ShapePath(startsWithRoot: Boolean, steps: List[Step])
@@ -25,8 +26,11 @@ object ShapePath {
   def eval(p: ShapePath, s: Schema, maybeValue: Option[Value] = None): (List[ProcessingError], Value) =
     evaluateShapePath(p,s, maybeValue.getOrElse(Value(List()))).run
 
-  def fromString(str: String, format: String = "Compact"): Either[String, ShapePath] =
-    Left(s"Not implemented ShapePath.fromString yet")
+  def fromString(str: String, format: String = "Compact", base: Option[IRI] = None): Either[String, ShapePath] =
+   format.toLowerCase match {
+    case "compact" => Parser.parseShapePath(str,base)
+    case _ => Left(s"Unsupported input format: $format")
+   }
 
   private type Comp[A] = Writer[List[ProcessingError],A]
 

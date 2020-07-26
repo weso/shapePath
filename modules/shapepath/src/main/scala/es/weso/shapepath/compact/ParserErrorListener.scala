@@ -1,4 +1,4 @@
-package es.weso.shex.compact
+package es.weso.shapepath.compact
 
 import java.util
 import org.antlr.v4.runtime._

@@ -43,20 +43,39 @@ class ShapePathTest extends AnyFunSpec with Matchers {
 
   def cnvFailure(df: ParsingFailure): Throwable = new RuntimeException(df.getMessage())
 
+  def processEntryPositive(name: String, from: String, shapePath: String, expect: String): Unit = {
+    val cmp = readContents(manifestPath + from).use(str => for {
+      schema <- Schema.fromString(str, "ShEXJ", None)
+      shapePath <- eitherStr2io(ShapePath.fromString(shapePath))
+      pair = ShapePath.eval(shapePath, schema)
+      (es, v) = pair
+      _ <- IO {
+        println(s"Processing errors: ${es.map(_ + "\n").mkString}")
+      }
+    } yield v)
+    cmp.attempt.unsafeRunSync().fold(
+      err => fail(s"Error $err"),
+      value => info(s"$value should be(${expect})")
+    )
+  }
+
+  def processEntryNegative(name: String, shapePath: String, msgExpected: String): Unit = {
+    val cmp = for {
+      sp <- eitherStr2io(ShapePath.fromString(shapePath))
+    } yield sp
+    cmp.attempt.unsafeRunSync().fold(
+      err => info(s"Failed to parse as expected: $err"),
+      value => fail(s"Parsed ${shapePath}as $value but should fail: $msgExpected")
+    )
+  }
+
   def processEntry(entry: ManifestEntry): IO[Unit] = for {
      _ <- IO { it(s"Should run entry: ${entry.name}") {
-       val cmp = readContents(manifestPath + entry.from).use(str => for {
-         schema <- Schema.fromString(str,"ShEXJ",None)
-         shapePath <- eitherStr2io(ShapePath.fromString(entry.shapePath,"Compact"))
-         pair = ShapePath.eval(shapePath, schema)
-         (es,v) = pair
-         _ <- IO { println(s"Processing errors: ${es.map(e => e + "\n").mkString}")}
-       } yield v)
-       cmp.attempt.unsafeRunSync().fold(
-         err => fail(s"Error $err"),
-         value => info(s"$value should be(${entry.expect})")
-       )
-    }
+           entry.throws match {
+             case None | Some(false) => processEntryPositive(entry.name,entry.from,entry.shapePath,entry.expect)
+             case Some(true) => processEntryNegative(entry.name, entry.shapePath, entry.expect)
+           }
+         }
     }
   } yield ()
 

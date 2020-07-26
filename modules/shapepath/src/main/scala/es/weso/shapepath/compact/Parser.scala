@@ -1,6 +1,7 @@
-package es.weso.shex.compact
+package es.weso.shapepath.compact
 
 import java.io.{ByteArrayInputStream, InputStreamReader, Reader => JavaReader}
+
 import cats.data._
 import cats.implicits._
 import com.typesafe.scalalogging._
@@ -11,6 +12,9 @@ import es.weso.shex.parser._
 import org.antlr.v4.runtime._
 import java.nio.charset.StandardCharsets
 
+import es.weso.shapepath.ShapePath
+import es.weso.shapepath.parser.{ShapePathDocLexer, ShapePathDocParser}
+import es.weso.shex.compact.ParserErrorListener
 import es.weso.utils.FileUtils
 
 import scala.collection.immutable.ListMap
@@ -92,7 +96,7 @@ object Parser extends LazyLogging {
     _ <- updateState(s => s.copy(tripleExprMap = s.tripleExprMap + (label -> te)))
   } yield (te.addId(label))
 
-  def parseSchema(str: String, base: Option[IRI]): Either[String, Schema] = {
+  def parseShapePath(str: String, base: Option[IRI]): Either[String, ShapePath] = {
     val UTF8_BOM = "\uFEFF"
     val s =
       if (str.startsWith(UTF8_BOM)) {
@@ -102,21 +106,21 @@ object Parser extends LazyLogging {
     val reader: JavaReader =
       new InputStreamReader(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)))
     logger.debug(s"s:$s")
-    parseSchemaReader(reader, base)
+    parseReader(reader, base)
   }
 
-  def parseSchemaFromFile(fileName: String, base: Option[IRI]): Either[String, Schema] = for {
+  def parseShapePathFromFile(fileName: String, base: Option[IRI]): Either[String, ShapePath] = for {
     reader <- FileUtils.getStream(fileName)
-    schema <- parseSchemaReader(reader, base)
+    schema <- parseReader(reader, base)
   } yield schema
 
-  def parseSchemaReader(reader: JavaReader,
-                        base: Option[IRI]
-                       ): Either[String, Schema] = {
+  def parseReader(reader: JavaReader,
+                  base: Option[IRI]
+                 ): Either[String, ShapePath] = {
     val input: CharStream = CharStreams.fromReader(reader)
-    val lexer: ShExDocLexer = new ShExDocLexer(input)
+    val lexer: ShapePathDocLexer = new ShapePathDocLexer(input)
     val tokens: CommonTokenStream = new CommonTokenStream(lexer)
-    val parser: ShExDocParser = new ShExDocParser(tokens)
+    val parser: ShapePathDocParser = new ShapePathDocParser(tokens)
 
     val errorListener = new ParserErrorListener
     // lexer.removeErrorListeners()
@@ -124,8 +128,8 @@ object Parser extends LazyLogging {
     lexer.addErrorListener(errorListener)
     parser.addErrorListener(errorListener)
 
-    val maker = new SchemaMaker() // new DebugSchemaMaker()
-    val builder = maker.visit(parser.shExDoc()).asInstanceOf[Builder[Schema]]
+    val maker = new ShapePathMaker()
+    val builder = maker.visit(parser.shapePathDoc()).asInstanceOf[Builder[ShapePath]]
     val errors = errorListener.getErrors
     if (errors.length > 0) {
       Left(errors.mkString("\n"))
