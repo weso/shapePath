@@ -1,0 +1,15 @@
+Notes on ShapePath implementation
+=================================
+
+List of errors/problems in test-suite
+
+- nested.shex is not in folder
+
+- In "nested_S0_2_1_valueExpr"
+- base:/S0 appears in nested.json but in shapepath is: @<S0>
+   - I solved it providing by default a base:// uri to the tests parser (not sure it that's intended)
+
+Definition of evaluateIndex
+- Case: 
+  If I.type = "TripleConstraint" can we get here?
+    If i and i = 1, add I to new value. (I think we should add: I.valueExpr)

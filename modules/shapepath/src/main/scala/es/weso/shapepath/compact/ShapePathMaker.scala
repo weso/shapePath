@@ -47,23 +47,30 @@ class ShapePathMaker extends ShapePathDocBaseVisitor[Any] with LazyLogging {
     } yield steps
   }
 
-  override def visitStepExpr(ctx: StepExprContext): Builder[Step] = for {
+  def visitStepExpr(ctx: StepExprContext): Builder[Step] = ctx match {
+    case ectx : ExprIndexStepContext => for {
+      maybeCtx <- visitOpt(visitContextTest, ectx.contextTest())
+      exprIndex <- visitExprIndex(ectx.exprIndex())
+    } yield ExprStep(maybeCtx,exprIndex)
+    case cctx : ContextStepContext => for {
+      context <- visitContextTest(cctx.contextTest())
+    } yield ContextStep(context)
+    case _ => err(s"visitStepExpr: unknown context: $ctx / ${ctx.getClass.getName}")
+  }/*for {
    maybeCtx <- visitContextTest(ctx.contextTest())
    exprIndex <- visitExprIndex(ctx.exprIndex())
-  } yield ExprStep(maybeCtx,exprIndex)
+  } yield ExprStep(maybeCtx,exprIndex) */
 
-  override def visitContextTest(ctx: ContextTestContext): Builder[Option[Context]] =
-    if (isDefined(ctx)) {
+  override def visitContextTest(ctx: ContextTestContext): Builder[Context] =
       ctx match {
         case _ if (isDefined(ctx.shapeExprContext())) => for {
          shapeExprContext <- visitShapeExprContext(ctx.shapeExprContext())
-        } yield Some(shapeExprContext)
+        } yield shapeExprContext
         case _ if (isDefined(ctx.tripleExprContext())) => for {
           tripleExprContext <- visitTripleExprContext(ctx.tripleExprContext())
-        } yield Some(tripleExprContext)
+        } yield tripleExprContext
         case _ => err(s"visitContextTest: unknown ctx = $ctx")
       }
-    } else ok(none[Context])
 
   override def visitShapeExprContext(ctx: ShapeExprContextContext): Builder[Context] = ctx match {
     case _ if isDefined(ctx.KW_ShapeAnd()) => ok(ShapeAndCtx)

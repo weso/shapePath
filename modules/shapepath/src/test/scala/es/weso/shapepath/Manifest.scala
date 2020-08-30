@@ -7,7 +7,9 @@ case class ManifestEntry(
     from: String,
     shapePath: String,
     expect: String,
-    throws: Option[Boolean]
+    throws: Option[Boolean],
+    status: Option[String],
+    comment: Option[String]
 )
 
 case class Manifest(

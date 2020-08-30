@@ -21,7 +21,8 @@ relativePathExpr
  ;
 
 stepExpr
- : contextTest ? exprIndex
+ : contextTest ? exprIndex   # exprIndexStep
+ | contextTest               # contextStep
  ;
 
 contextTest

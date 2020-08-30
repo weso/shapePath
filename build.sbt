@@ -59,7 +59,7 @@ lazy val rdf4j_runtime  = "org.eclipse.rdf4j" % "rdf4j-runtime"    % rdf4jVersio
 
 // WESO components
 lazy val shex              = "es.weso"                    %% "shex"            % shexVersion
-
+lazy val srdfJena          = "es.weso"                    %% "srdfjena"        % srdfVersion
 
 lazy val scalaLogging   = "com.typesafe.scala-logging" %% "scala-logging" % loggingVersion
 lazy val scallop        = "org.rogach"                 %% "scallop"       % scallopVersion
@@ -108,6 +108,8 @@ lazy val shapePathRoot = project
       scalaLogging,
       scallop,
       typesafeConfig,
+      shex,
+      srdfJena,
       pprint
     ),
     cancelable in Global := true,
@@ -169,10 +171,10 @@ lazy val sharedDependencies = Seq(
 )
 
 lazy val packagingSettings = Seq(
-  mainClass in Compile := Some("es.weso.shexs.Main"),
-  mainClass in assembly := Some("es.weso.shexs.Main"),
+  mainClass in Compile := Some("es.weso.shapepath.Main"),
+  mainClass in assembly := Some("es.weso.shapepath.Main"),
   test in assembly := {},
-  assemblyJarName in assembly := "shex-s.jar",
+  assemblyJarName in assembly := "shapepath.jar",
   packageSummary in Linux := name.value,
   packageSummary in Windows := name.value,
   packageDescription := name.value

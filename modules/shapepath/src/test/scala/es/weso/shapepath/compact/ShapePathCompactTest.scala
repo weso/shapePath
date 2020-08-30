@@ -14,6 +14,7 @@ class ShapePathCompactTest extends AnyFunSpec with Matchers {
     shouldParse(s"1/2", ShapePath(false,List(ExprStep(None,IntTripleExprIndex(1)),ExprStep(None,IntTripleExprIndex(2)))))
     shouldParse(s"1/@2", ShapePath(false,List(ExprStep(None,IntTripleExprIndex(1)),ExprStep(None,IntShapeIndex(2)))))
     shouldParse(s"/1/@2", ShapePath(true,List(ExprStep(None,IntTripleExprIndex(1)),ExprStep(None,IntShapeIndex(2)))))
+    shouldParse("/shape", ShapePath(true,List(ContextStep(ShapeCtx))))
   }
 
   def shouldParse(str: String, expected: ShapePath): Unit = {
